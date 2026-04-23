@@ -56,7 +56,7 @@
                                             <th>No</th>
                                             <th>ID Peminjaman</th>
                                             <th>Tanggal Pinjam</th>
-                                            <th>Tanggal Kembali</th>
+                                            <th>Tanggal Harus Kembali</th>
                                             <th>Status</th>
                                             <th>Nama</th>
                                             <th>Aksi</th>
@@ -67,15 +67,17 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $row->id_peminjaman }}</td>
-                                                <td>{{ $row->tanggal_pinjam }}</td>
-                                                <td>{{ $row->tanggal_harus_kembali }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($row->tanggal_pinjam)->format('d-m-Y H:i') }}
+                                                </td>
+                                                <td>{{ \Carbon\Carbon::parse($row->tanggal_harus_kembali)->format('d-m-Y H:i') }}
+                                                </td>
                                                 <td>{{ $row->status }}</td>
                                                 <td>{{ $row->user->name ?? 'User tidak ditemukan' }}</td>
                                                 <td>
                                                     <button class="btn btn-warning btn-sm btn-edit"
                                                         data-id="{{ $row->id_peminjaman }}"
-                                                        data-pinjam="{{ \Carbon\Carbon::parse($row->tanggal_pinjam)->format('Y-m-d') }}"
-                                                        data-kembali="{{ \Carbon\Carbon::parse($row->tanggal_harus_kembali)->format('Y-m-d') }}"
+                                                        data-pinjam="{{ \Carbon\Carbon::parse($row->tanggal_pinjam)->format('Y-m-d\TH:i') }}"
+                                                        data-kembali="{{ \Carbon\Carbon::parse($row->tanggal_harus_kembali)->format('Y-m-d\TH:i') }}"
                                                         data-status="{{ $row->status }}"
                                                         data-user="{{ $row->user->id }}">Edit</button>
                                                     <form action="{{ url('Peminjaman/' . $row->id_peminjaman) }}"
@@ -108,17 +110,18 @@
                                         <form class="user" action="{{ route('Peminjaman.store') }}" method="POST">
                                             @csrf
                                             <div class="form-group">
-                                                <input type="date" class="form-control form-control-user"
+                                                <label for="tanggal_pinjam">Tanggal Pinjam</label>
+                                                <input type="datetime-local" class="form-control form-control-user"
                                                     name="tanggal_pinjam" placeholder="Tanggal Pinjam" required>
                                             </div>
                                             <div class="form-group">
-                                                <input type="date" class="form-control form-control-user"
+                                                <label for="tanggal_harus_kembali">Tanggal Harus Kembali</label>
+                                                <input type="datetime-local" class="form-control form-control-user"
                                                     name="tanggal_harus_kembali" placeholder="Tanggal Harus Kembali"
                                                     required>
                                             </div>
                                             <div class="form-group">
-                                                <select name="status" class="form-control rounded-pill"
-                                                    required>
+                                                <select name="status" class="form-control rounded-pill" required>
                                                     <option value="">-- Pilih Status --</option>
                                                     <option value="Selesai">Selesai</option>
                                                     <option value="Belum">Belum
@@ -126,7 +129,8 @@
                                                 </select>
                                             </div>
                                             <div class="form-group">
-                                                <select name="id_user" class="form-control rounded-pill" required>
+                                                <select name="id_user" class="form-control select2" required>
+                                                    <option value="">-- Pilih --</option>
                                                     @foreach ($user as $row)
                                                         <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                     @endforeach
@@ -154,16 +158,18 @@
                                             {{ csrf_field() }}
                                             <div class="form-group">
                                                 <input type="text" class="form-control form-control-user"
-                                                    name="id_peminjaman" id="id_peminjaman" placeholder="ID Peminjaman"
-                                                    readonly>
+                                                name="id_peminjaman" id="id_peminjaman" placeholder="ID Peminjaman"
+                                                readonly>
                                             </div>
                                             <div class="form-group">
-                                                <input type="date" class="form-control form-control-user"
-                                                    name="tanggal_pinjam" id="tanggal_pinjam"
-                                                    placeholder="Tanggal Pinjam" required>
+                                                <label for="tanggal_pinjam">Tanggal Pinjam</label>
+                                                <input type="datetime-local" class="form-control form-control-user"
+                                                name="tanggal_pinjam" id="tanggal_pinjam"
+                                                placeholder="Tanggal Pinjam" required>
                                             </div>
                                             <div class="form-group">
-                                                <input type="date" class="form-control form-control-user"
+                                                <label for="tanggal_harus_kembali">Tanggal Harus Kembali</label>
+                                                <input type="datetime-local" class="form-control form-control-user"
                                                     name="tanggal_harus_kembali" id="tanggal_harus_kembali"
                                                     placeholder="Tanggal harus kembali" required>
                                             </div>
@@ -177,8 +183,9 @@
                                                 </select>
                                             </div>
                                             <div class="form-group">
-                                                <select name="id_user" id="id_user" class="form-control rounded-pill"
+                                                <select name="id_user" id="id_user" class="form-control select2"
                                                     required>
+                                                    <option value="">-- Pilih --</option>
                                                     @foreach ($user as $row)
                                                         <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                     @endforeach
@@ -232,6 +239,12 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/datatables-demo.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap4-theme@1.0.0/dist/select2-bootstrap4.min.css"
+        rel="stylesheet" />
+
     <script>
         document.querySelectorAll('.btn-edit').forEach(button => {
             button.addEventListener('click', function () {
@@ -252,6 +265,13 @@
                 document.getElementById('status').value = status;
                 document.getElementById('id_user').value = user;
             });
+        });
+
+        $('.select2').select2({
+            theme: 'bootstrap4',  // PENTING: Pakai theme bootstrap4
+            placeholder: "Ketik untuk mencari Nama...",
+            allowClear: true,
+            width: '100%'
         });
     </script>
 

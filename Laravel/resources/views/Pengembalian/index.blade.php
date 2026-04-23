@@ -55,7 +55,7 @@
                                         <tr>
                                             <th>No</th>
                                             <th>Pengembalian ID</th>
-                                            <th>Peminjaman ID</th>
+                                            <th>Peminjaman</th>
                                             <th>Tanggal Kembali</th>
                                             <th>Tanggal harus kembali</th>
                                             <th>Denda</th>
@@ -67,16 +67,18 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $row->id_pengembalian }}</td>
-                                                <td>{{ $row->peminjaman->id_peminjaman ?? 'User tidak ditemukan' }}</td>
-                                                <td>{{ $row->tanggal_kembali }}</td>
-                                                <td>{{ $row->tanggal_harus_kembali }}</td>
+                                                <td>{{ $row->id_peminjaman }} - {{ $row->peminjaman->user->name ?? 'User tidak ditemukan' }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($row->tanggal_kembali)->format('d-m-Y H:i') }}
+                                                </td>
+                                                <td>{{ \Carbon\Carbon::parse($row->peminjaman->tanggal_harus_kembali)->format('d-m-Y H:i') }}
+                                                </td>
                                                 <td>{{ $row->denda }}</td>
                                                 <td>
                                                     <button class="btn btn-sm btn-warning btn-edit"
                                                         data-id="{{ $row->id_pengembalian }}"
                                                         data-peminjaman="{{ $row->peminjaman->id_peminjaman }}"
                                                         data-kembali="{{ \Carbon\Carbon::parse($row->tanggal_kembali)->format('Y-m-d') }}"
-                                                        data-harus_kembali="{{ \Carbon\Carbon::parse($row->tanggal_harus_kembali)->format('Y-m-d') }}"
+                                                        data-harus_kembali="{{ \Carbon\Carbon::parse($row->peminjaman->tanggal_harus_kembali)->format('Y-m-d') }}"
                                                         data-denda="{{ $row->denda }}">Edit</button>
                                                     <form action="{{ url('Pengembalian/' . $row->id_pengembalian) }}"
                                                         method="POST" style="display:inline;">
@@ -111,16 +113,18 @@
                                                 <select name="id_peminjaman" class="form-control rounded-pill" required>
                                                     <option value="">--- Pilih ---</option>
                                                     @foreach ($Peminjaman as $row)
-                                                        <option value="{{ $row->id_peminjaman }}">{{ $row->id_peminjaman }}
+                                                        <option value="{{ $row->id_peminjaman }}">{{ $row->user->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="form-group">
+                                                <label for="tanggal_kembali">Tanggal Kembali</label>
                                                 <input type="date" class="form-control form-control-user"
                                                     name="tanggal_kembali" placeholder="Tanggal kembali" required>
                                             </div>
                                             <div class="form-group">
+                                                <label for="tanggal_harus_kembali">Tanggal Harus Kembali</label>
                                                 <input type="date" class="form-control form-control-user"
                                                     name="tanggal_harus_kembali" placeholder="Tanggal harus kembali"
                                                     required>
@@ -155,20 +159,23 @@
                                                     placeholder="ID Pengembalian" readonly>
                                             </div>
                                             <div class="form-group">
-                                                <select name="id_peminjaman" id="id_peminjaman" class="form-control rounded-pill" required>
+                                                <select name="id_peminjaman" id="id_peminjaman"
+                                                    class="form-control rounded-pill" required>
                                                     <option value="">--- Pilih ---</option>
                                                     @foreach ($Peminjaman as $row)
-                                                        <option value="{{ $row->id_peminjaman }}">{{ $row->id_peminjaman }}
+                                                        <option value="{{ $row->id_peminjaman }}">{{ $row->user->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="form-group">
+                                                <label for="tanggal_kembali">Tanggal Kembali</label>
                                                 <input type="date" class="form-control form-control-user"
                                                     name="tanggal_kembali" id="tanggal_kembali"
                                                     placeholder="Tanggal kembali" required>
                                             </div>
                                             <div class="form-group">
+                                                <label for="tanggal_harus_kembali">Tanggal Harus Kembali</label>
                                                 <input type="date" class="form-control form-control-user"
                                                     name="tanggal_harus_kembali" id="tanggal_harus_kembali"
                                                     placeholder="Tanggal harus kembali" required>

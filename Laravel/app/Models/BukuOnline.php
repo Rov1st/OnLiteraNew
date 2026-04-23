@@ -8,5 +8,5 @@ class BukuOnline extends Model
 {
     protected $table = 'buku_online'; // Nama tabel yang benar
     protected $primaryKey = 'id_buku';
-    protected $fillable = ['judul', 'kategori', 'genre', 'penjelasan', 'buku_url', 'penulis', 'sumber',];
+    protected $fillable = ['judul', 'kategori', 'genre', 'penjelasan', 'img', 'buku_url', 'penulis', 'sumber',];
 }

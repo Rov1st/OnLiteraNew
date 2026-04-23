@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengembalian;
 use App\Models\Peminjaman;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PengembalianController extends Controller
@@ -34,7 +35,7 @@ class PengembalianController extends Controller
      */
     public function store(Request $request)
     {
-         $request->validate([
+        $request->validate([
             'id_peminjaman' => 'required|integer|exists:peminjaman,id_peminjaman',
             'tanggal_kembali' => 'required|date',
             'tanggal_harus_kembali' => 'required|date',
@@ -76,7 +77,7 @@ class PengembalianController extends Controller
      */
     public function update(Request $request, string $id_pengembalian)
     {
-         $Pengembalian = Pengembalian::where('id_pengembalian', $id_pengembalian)->first();
+        $Pengembalian = Pengembalian::where('id_pengembalian', $id_pengembalian)->first();
 
         if (!$Pengembalian) {
             return redirect('Pengembalian')->with('success', 'Peminjaman Gagal Diubah..');
@@ -105,7 +106,7 @@ class PengembalianController extends Controller
      */
     public function destroy($id_pengembalian)
     {
-         Pengembalian::where('id_pengembalian', $id_pengembalian)->delete();
+        Pengembalian::where('id_pengembalian', $id_pengembalian)->delete();
         return redirect('Pengembalian')->with('success', 'Peminjaman berhasil dihapus..');
     }
 }

@@ -16,7 +16,7 @@ class PeminjamanController extends Controller
         $Peminjaman = Peminjaman::all(); // Ambil semua data Peminjaman
         $Peminjaman = Peminjaman::with('user')->get(); // Ambil semua data Peminjaman
         $user = User::all();
-        return view('Peminjaman.index', compact('user','Peminjaman'));
+        return view('Peminjaman.index', compact('user', 'Peminjaman'));
     }
 
     /**
@@ -109,4 +109,5 @@ class PeminjamanController extends Controller
         Peminjaman::where('id_peminjaman', $id_peminjaman)->delete();
         return redirect('Peminjaman')->with('success', 'Peminjaman berhasil dihapus..');
     }
+
 }

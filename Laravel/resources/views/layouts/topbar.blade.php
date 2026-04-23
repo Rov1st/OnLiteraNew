@@ -11,64 +11,38 @@
 
         <!-- Nav Item - Messages -->
         <li class="nav-item dropdown no-arrow mx-1">
-            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown"
+            <audio id="notifSound" preload="auto">
+            <source src="/sounds/notif1.mp3" type="audio/mpeg">
+        </audio>
+
+            <a class="nav-link dropdown-toggle" href="{{ route('DetailPeminjaman.index', ['status' => 'Menunggu Konfirmasi']) }}" id="messagesDropdown" role="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-envelope fa-fw"></i>
                 <!-- Counter - Messages -->
-                <span class="badge badge-danger badge-counter">7</span>
+                <span class="badge badge-danger badge-counter">{{$jumlahPinjamBelumKonfirmasi}}</span>
             </a>
             <!-- Dropdown - Messages -->
             <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="messagesDropdown">
+                aria-labelledby="messagesDropdown" id="notifDropdown">
                 <h6 class="dropdown-header">
                     Message Center
                 </h6>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                        <img class="rounded-circle" src="img/undraw_profile_1.svg" alt="...">
-                        <div class="status-indicator bg-success"></div>
-                    </div>
-                    <div class="font-weight-bold">
-                        <div class="text-truncate">Hi there! I am wondering if you can help me with a
-                            problem I've been having.</div>
-                        <div class="small text-gray-500">Emily Fowler · 58m</div>
-                    </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                        <img class="rounded-circle" src="img/undraw_profile_2.svg" alt="...">
-                        <div class="status-indicator"></div>
-                    </div>
+                <div id="notifItems">
+        @foreach ($pinjamBelumKonfirmasi as $pinjam)
+            <a class="dropdown-item d-flex align-items-center" href="/DetailPeminjaman">
+                <div class="font-weight-bold">
                     <div>
-                        <div class="text-truncate">I have the photos that you ordered last month, how
-                            would you like them sent to you?</div>
-                        <div class="small text-gray-500">Jae Chun · 1d</div>
+                        {{ $pinjam->user->display_name }} mengajukan pinjaman pada:<br> {{ $pinjam->tanggal_pinjam }}
                     </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                        <img class="rounded-circle" src="img/undraw_profile_3.svg" alt="...">
-                        <div class="status-indicator bg-warning"></div>
+                    <div class="small text-gray-500">
+                        Status: {{ $pinjam->status }}
                     </div>
-                    <div>
-                        <div class="text-truncate">Last month's report looks great, I am very happy with
-                            the progress so far, keep up the good work!</div>
-                        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                    </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                        <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60" alt="...">
-                        <div class="status-indicator bg-success"></div>
-                    </div>
-                    <div>
-                        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
-                            told me that people say this to all dogs, even if they aren't good...</div>
-                        <div class="small text-gray-500">Chicken the Dog · 2w</div>
-                    </div>
-                </a>
-                <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
-            </div>
+                </div>
+            </a>
+        @endforeach
+    </div>
+    <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
+</div>
         </li>
 
         <div class="topbar-divider d-none d-sm-block"></div>
@@ -85,14 +59,14 @@
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Profile
                 </a>
-                <a class="dropdown-item" href="#">
+                {{-- <a class="dropdown-item" href="#">
                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                     Settings
                 </a>
                 <a class="dropdown-item" href="#">
                     <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                     Activity Log
-                </a>
+                </a> --}}
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -128,3 +102,77 @@
     </div>
 </div>
 </div>
+
+<script>
+let lastCount = 0;
+let notifSound = document.getElementById('notifSound');
+let notifPopup = document.getElementById('notifPopup');
+
+// Izinkan audio play setelah user klik halaman
+document.body.addEventListener("click", function() {
+    notifSound.play().then(() => {
+        notifSound.pause();
+        notifSound.currentTime = 0;
+    });
+}, { once: true });
+
+function showPopup(message) {
+    notifPopup.innerText = message;
+    notifPopup.style.display = "block";
+
+    // Hilangkan popup setelah 4 detik
+    setTimeout(() => {
+        notifPopup.style.display = "none";
+    }, 4000);
+}
+
+function loadNotif() {
+    fetch('/notif/unread-data')
+        .then(response => response.json())
+        .then(data => {
+            // Update badge angka
+            document.querySelector('.badge-counter').innerText = data.count;
+
+            // Jika ada request baru
+            if (data.count > lastCount) {
+                notifSound.play().catch(err => console.log("Sound blocked:", err));
+                showPopup("📚 Ada peminjaman baru menunggu konfirmasi!");
+            }
+            lastCount = data.count;
+
+            // Update isi notif dropdown
+            let notifItems = document.getElementById('notifItems');
+            if (data.list.length === 0) {
+                notifItems.innerHTML = `
+                    <div class="dropdown-item text-center small text-gray-500">
+                        Tidak ada peminjaman baru
+                    </div>
+                `;
+            } else {
+                let html = '';
+                data.list.forEach(pinjam => {
+                    html += `
+                        <a class="dropdown-item d-flex align-items-center" href="/DetailPeminjaman">
+                            <div class="font-weight-bold">
+                                <div>
+                                    ${pinjam.user.display_name} mengajukan pinjaman pada:<br> ${pinjam.tanggal_pinjam}
+                                </div>
+                                <div class="small text-gray-500">
+                                    Status: ${pinjam.status}
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                });
+                notifItems.innerHTML = html;
+            }
+        })
+        .catch(err => console.error('Error load notif:', err));
+}
+
+// Jalankan pertama kali
+loadNotif();
+
+// Refresh tiap 5 detik
+setInterval(loadNotif, 5000);
+</script>

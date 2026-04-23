@@ -8,5 +8,16 @@ class BukuOffline extends Model
 {
     protected $table = 'buku_offline';
     protected $primaryKey = 'id_buku';
-    protected $fillable = ['judul','kategori','genre','penjelasan','penulis','penerbit','sumber_perpustakaan','status'];
+    public $incrementing = true;
+    protected $keyType = 'int';
+    protected $fillable = ['judul', 'kategori', 'penjelasan', 'penulis', 'tahun_rilis', 'penerbit', 'tahun_terbit', 'stok', 'img', 'sumber_perpustakaan', 'status', 'counter'];
+    public function detailPeminjaman()
+    {
+        return $this->hasMany(DetailPeminjaman::class, 'id_buku', 'id_buku');
+    }
+
+    public function genres()
+    {
+        return $this->hasMany(Genre::class, 'id_buku', 'id_buku');
+    }
 }

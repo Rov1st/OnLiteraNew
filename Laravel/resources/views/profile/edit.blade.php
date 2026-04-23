@@ -43,8 +43,6 @@
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Profile</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
 
                     <!-- Content Row -->
@@ -124,14 +122,73 @@
                                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <label for="NIK" class="ml-3 small font-weight-bold">NIK</label>
                                                     <input id="NIK" type="text" class="form-control form-control-user"
-                                                        name="NIK" value="{{old('NIK', $user->NIK)}}" required
-                                                        autocomplete="NIK" placeholder="NIK">
+                                                        name="NIK" value="{{old('NIK', $user->NIK)}}" autocomplete="NIK"
+                                                        placeholder="NIK">
                                                 </div>
                                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <label for="NISN" class="ml-3 small font-weight-bold">NISN</label>
                                                     <input id="NISN" type="text" class="form-control form-control-user"
                                                         name="NISN" value="{{ old('NISN', $user->NISN) }}" required
                                                         autocomplete="NISN" placeholder="NISN">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-lg-13 mb-3 mb-sm-0">
+                                                    <x-input-label class="small font-weight-bold ml-3" for="kelas"
+                                                        :value="__('Kelas')" />
+                                                    <select id="kelas" name="kelas" class="form-control rounded-pill"
+                                                        style="height: 50px; font-size: .8rem;" required
+                                                        placeholder="{{old('kelas', $user->kelas)}}">
+                                                        <option value="">-- Pilih Kelas --</option>
+
+                                                        <!-- Kelas X -->
+                                                        <optgroup label="Kelas X">
+                                                            <option value="X RPL 1" {{ $user->kelas == 'X RPL 1' ? 'selected' : '' }}>X RPL 1</option>
+                                                            <option value="X RPL 2" {{ $user->kelas == 'X RPL 2' ? 'selected' : '' }}>X RPL 2</option>
+                                                            <option value="X AK 1" {{ $user->kelas == 'X AK 1' ? 'selected' : '' }}>X AK 1</option>
+                                                            <option value="X AK 2" {{ $user->kelas == 'X AK 2' ? 'selected' : '' }}>X AK 2</option>
+                                                            <option value="X AK 3" {{ $user->kelas == 'X AK 3' ? 'selected' : '' }}>X AK 3</option>
+                                                            <option value="X AK 4" {{ $user->kelas == 'X AK 4' ? 'selected' : '' }}>X AK 4</option>
+                                                            <option value="X AK 5" {{ $user->kelas == 'X AK 5' ? 'selected' : '' }}>X AK 5</option>
+                                                            <option value="X AK 6" {{ $user->kelas == 'X AK 6' ? 'selected' : '' }}>X AK 6</option>
+                                                            <option value="X TKJ 1" {{ $user->kelas == 'X TKJ 1' ? 'selected' : '' }}>X TKJ 1</option>
+                                                            <option value="X TKJ 2" {{ $user->kelas == 'X TKJ 2' ? 'selected' : '' }}>X TKJ 2</option>
+                                                            <option value="X TKJ 3" {{ $user->kelas == 'X TKJ 3' ? 'selected' : '' }}>X TKJ 3</option>
+                                                        </optgroup>
+
+                                                        <!-- Kelas XI -->
+                                                        <optgroup label="Kelas XI">
+                                                            <option value="XI RPL 1" {{ $user->kelas == 'XI RPL 1' ? 'selected' : '' }}>XI RPL 1</option>
+                                                            <option value="XI RPL 2" {{ $user->kelas == 'XI RPL 2' ? 'selected' : '' }}>XI RPL 2</option>
+                                                            <option value="XI AK 1" {{ $user->kelas == 'XI AK 1' ? 'selected' : '' }}>XI AK 1</option>
+                                                            <option value="XI AK 2" {{ $user->kelas == 'XI AK 2' ? 'selected' : '' }}>XI AK 2</option>
+                                                            <option value="XI AK 3" {{ $user->kelas == 'XI AK 3' ? 'selected' : '' }}>XI AK 3</option>
+                                                            <option value="XI AK 4" {{ $user->kelas == 'XI AK 4' ? 'selected' : '' }}>XI AK 4</option>
+                                                            <option value="XI AK 5" {{ $user->kelas == 'XI AK 5' ? 'selected' : '' }}>XI AK 5</option>
+                                                            <option value="XI AK 6" {{ $user->kelas == 'XI AK 6' ? 'selected' : '' }}>XI AK 6</option>
+                                                            <option value="XI TKJ 1" {{ $user->kelas == 'XI TKJ 1' ? 'selected' : '' }}>XI TKJ 1</option>
+                                                            <option value="XI TKJ 2" {{ $user->kelas == 'XI TKJ 2' ? 'selected' : '' }}>XI TKJ 2</option>
+                                                            <option value="XI TKJ 3" {{ $user->kelas == 'XI TKJ 3' ? 'selected' : '' }}>XI TKJ 3</option>
+                                                        </optgroup>
+
+                                                        <!-- Kelas XII -->
+                                                        <optgroup label="Kelas XII">
+                                                            <option value="XII RPL 1" {{ $user->kelas == 'XII RPL 1' ? 'selected' : '' }}>XII RPL 1</option>
+                                                            <option value="XII RPL 2" {{ $user->kelas == 'XII RPL 2' ? 'selected' : '' }}>XII RPL 2</option>
+                                                            <option value="XII AK 1" {{ $user->kelas == 'XII AK 1' ? 'selected' : '' }}>XII AK 1</option>
+                                                            <option value="XII AK 2" {{ $user->kelas == 'XII AK 2' ? 'selected' : '' }}>XII AK 2</option>
+                                                            <option value="XII AK 3" {{ $user->kelas == 'XII AK 3' ? 'selected' : '' }}>XII AK 3</option>
+                                                            <option value="XII AK 4" {{ $user->kelas == 'XII AK 4' ? 'selected' : '' }}>XII AK 4</option>
+                                                            <option value="XII AK 5" {{ $user->kelas == 'XII AK 5' ? 'selected' : '' }}>XII AK 5</option>
+                                                            <option value="XII AK 6" {{ $user->kelas == 'XII AK 6' ? 'selected' : '' }}>XII AK 6</option>
+                                                            <option value="XII TKJ 1" {{ $user->kelas == 'XII TKJ 1' ? 'selected' : '' }}>XII TKJ 1</option>
+                                                            <option value="XII TKJ 2" {{ $user->kelas == 'XII TKJ 2' ? 'selected' : '' }}>XII TKJ 2</option>
+                                                            <option value="XII TKJ 3" {{ $user->kelas == 'XII TKJ 3' ? 'selected' : '' }}>XII TKJ 3</option>
+                                                        </optgroup>
+
+                                                        <!-- Tamu -->
+                                                        <option value="Tamu" {{ $user->kelas == 'Tamu' ? 'selected' : '' }}>Tamu</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <button type="submit" class="btn btn-info btn-user btn-block">Save</button>
@@ -144,9 +201,6 @@
                                         <hr>
                                     </div>
                                 </div>
-                            </div>
-                            <hr>
-                            <div class="row justify-content-center">
                                 <div class="col-lg-6">
                                     <div class="p-5">
                                         <div class="text-left">
@@ -183,12 +237,15 @@
                                             @if (session('status') === 'password-updated')
                                                 <p x-data="{ show: true }" x-show="show" x-transition
                                                     x-init="setTimeout(() => show = false, 2000)"
-                                                    class="text-sm text-gray-900">{{ __('Saved.') }}</p>
+                                                    class="text-sm text-gray-600">{{ __('Saved.') }}</p>
                                             @endif
                                         </form>
                                         <hr>
                                     </div>
                                 </div>
+                            </div>
+                            <hr>
+                            <div class="row justify-content-center">
                                 <div class="col-lg-6">
                                     <div class="p-5">
                                         <div class="text-left">
@@ -237,7 +294,6 @@
                                                 </form>
                                             </div>
                                         </x-modal>
-
                                     </div>
                                 </div>
                             </div>
@@ -278,6 +334,11 @@
 
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-pie-demo.js"></script>
+    <script src="js/demo/datatables-demo.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
     <script src="//unpkg.com/alpinejs" defer></script>
 

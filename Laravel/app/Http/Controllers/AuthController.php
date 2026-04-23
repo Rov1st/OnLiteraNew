@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -62,4 +63,53 @@ class AuthController extends Controller
             'user' => $user,
         ]);
     }
+     public function changePassword(Request $request)
+    {
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Cek apakah password lama sesuai
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json(['message' => 'Password lama salah'], 400);
+        }
+
+        // Update password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password berhasil diperbarui']);
+    }
+
+    public function updatePhone(Request $request)
+    {
+        $request->validate([
+            'no_telp' => 'required|numeric|min:10',
+        ]);
+        /** @var User $user */
+        $user = Auth::user();
+        $user->no_telp = $request->no_telp;
+        $user->save(); // <— di sini `save()` harusnya jalan, asal $user itu instance model User
+
+        return response()->json(['message' => 'Phone number updated successfully', 'user' => $user]);
+    }
+
+    public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+
+    $user->update($request->only([
+        'display_name', 'NIK', 'NISN', 'kelas'
+    ]));
+
+    return response()->json([
+        'message' => 'Data user berhasil diperbarui',
+        'user' => $user
+    ]);
+}
+
 }

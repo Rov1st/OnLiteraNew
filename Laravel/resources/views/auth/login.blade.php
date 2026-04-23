@@ -1,70 +1,142 @@
-<x-guest-layout>
-    <div class="flex flex-col lg:flex-row w-full h-screen overflow-hidden">
-        <!-- Left: Form -->
-        <div class="w-full lg:w-1/2 px-6 py-12 overflow-y-auto">
-            <div class="max-w-md mx-auto space-y-8">
-                <!-- Logo & Header -->
-                <div>
-                    <img src="{{ asset('logo.svg') }}" alt="Logo" class="h-10 w-auto mb-4">
-                    <h2 class="text-2xl font-bold tracking-tight text-gray-900">
-                        Sign in to your account
-                    </h2>
-                    <p class="mt-2 text-sm text-gray-600">
-                        Don't have an account?
-                        <a href="{{ route('register') }}" class="font-semibold text-indigo-600 hover:text-indigo-500">Register</a>
-                    </p>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>OnLitera - Login</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        .bg-login-image {
+            background: url('{{ asset("images/register-preview.jpg") }}');
+            background-position: center;
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-primary">
+
+    <div class="container">
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <!-- Logo -->
+                                    <div class="mb-4">
+                                        <img src="{{ asset('logo.svg') }}" alt="Logo" style="height: 40px; width: auto;">
+                                    </div>
+
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Sign in to your account</h1>
+                                    </div>
+
+                                    <!-- Session Status -->
+                                    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+                                    <!-- Form -->
+                                    <form method="POST" action="{{ route('login') }}" class="user">
+                                        @csrf
+
+                                        <!-- Email Address -->
+                                        <div class="form-group">
+                                            <label for="email" class="small">Email</label>
+                                            <input type="email"
+                                                   class="form-control form-control-user @error('email') is-invalid @enderror"
+                                                   id="email"
+                                                   name="email"
+                                                   value="{{ old('email') }}"
+                                                   required
+                                                   autofocus
+                                                   autocomplete="username"
+                                                   placeholder="Enter Email Address...">
+                                            @error('email')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+
+                                        <!-- Password -->
+                                        <div class="form-group">
+                                            <label for="password" class="small">Password</label>
+                                            <input type="password"
+                                                   class="form-control form-control-user @error('password') is-invalid @enderror"
+                                                   id="password"
+                                                   name="password"
+                                                   required
+                                                   autocomplete="current-password"
+                                                   placeholder="Password">
+                                            @error('password')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+
+                                        <!-- Remember Me -->
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox small">
+                                                <input type="checkbox" class="custom-control-input" id="remember_me" name="remember">
+                                                <label class="custom-control-label" for="remember_me">Remember me</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            Log in
+                                        </button>
+
+                                        <!-- Forgot Password Link -->
+                                        @if (Route::has('password.request'))
+                                        <hr>
+                                        <div class="text-center">
+                                            <a class="small" href="{{ route('password.request') }}">Forgot your password?</a>
+                                        </div>
+                                        @endif
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Session Status -->
-                <x-auth-session-status class="mb-4" :status="session('status')" />
-
-                <!-- Form -->
-                <form method="POST" action="{{ route('login') }}" class="space-y-6">
-                    @csrf
-
-                    <!-- Email -->
-                    <div>
-                        <x-input-label for="email" :value="__('Email')" />
-                        <x-text-input id="email" class="block w-full mt-1" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                    </div>
-
-                    <!-- Password -->
-                    <div>
-                        <x-input-label for="password" :value="__('Password')" />
-                        <x-text-input id="password" class="block w-full mt-1" type="password" name="password" required autocomplete="current-password" />
-                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                    </div>
-
-                    <!-- Remember Me -->
-                    <div class="block mt-4">
-                        <label for="remember_me" class="inline-flex items-center">
-                            <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                            <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                        </label>
-                    </div>
-
-                    <!-- Submit -->
-                    <div class="flex items-center justify-between mt-6">
-                        @if (Route::has('password.request'))
-                            <a class="text-sm text-gray-600 hover:text-gray-900 underline" href="{{ route('password.request') }}">
-                                {{ __('Forgot your password?') }}
-                            </a>
-                        @endif
-
-                        <x-primary-button>
-                            {{ __('Log in') }}
-                        </x-primary-button>
-                    </div>
-                </form>
             </div>
+
         </div>
 
-        <!-- Right: Image -->
-        <div class="hidden lg:block w-full lg:w-1/2 h-screen">
-            <img src="{{ asset('images/register-preview.jpg') }}"
-                alt="Login image"
-                class="w-full h-full object-cover">
-        </div>
     </div>
-</x-guest-layout>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+</body>
+
+</html>

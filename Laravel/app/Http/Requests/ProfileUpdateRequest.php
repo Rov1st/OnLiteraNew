@@ -21,6 +21,7 @@ class ProfileUpdateRequest extends FormRequest
             'no_telp' => ['nullable', 'numeric'],
             'NIK' => ['nullable', 'numeric'],
             'NISN' => ['nullable', 'numeric'],
+            'kelas' => ['required', 'uppercase', 'string', 'max:10'],
             'email' => [
                 'required',
                 'string',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BukuOffline;
+use App\Models\Genre;
 use Illuminate\Http\Request;
 
 class BukuOfflineController extends Controller
@@ -12,8 +13,10 @@ class BukuOfflineController extends Controller
      */
     public function index()
     {
-        $BukuOffline = BukuOffline::all();
-        return view('BukuOffline.index', compact('BukuOffline'));
+        $BukuOffline = BukuOffline::with('genres')->get();
+        $genres = Genre::all();
+        $genreOptions = Genre::select('genre')->distinct()->pluck('genre');
+        return view('BukuOffline.index', compact('BukuOffline', 'genres', 'genreOptions'));
     }
 
     /**
@@ -29,27 +32,50 @@ class BukuOfflineController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'judul' => 'required|string|max:50',
             'kategori' => 'required|string|max:20',
-            'genre' => 'required|string|max:20',
-            'penjelasan' => 'required|string|max:255',
+            'genres' => 'required|array',
+            'penjelasan' => 'required|string', // untuk TEXT tidak perlu max kecil
             'penulis' => 'required|string|max:30',
+            'tahun_rilis' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
             'penerbit' => 'required|string|max:20',
+            'tahun_terbit' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
+            'stok' => 'required|integer|digits_between:1,2',
+            'img' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi gambar
             'sumber_perpustakaan' => 'required|string|max:30',
             'status' => 'required|string|in:tersedia,tidak tersedia',
         ]);
 
-        BukuOffline::create([
-            'judul' => $request->judul,
-            'kategori' => $request->kategori,
-            'genre' => $request->genre,
-            'penjelasan' => $request->penjelasan,
-            'penulis' => $request->penulis,
-            'penerbit' => $request->penerbit,
-            'sumber_perpustakaan' => $request->sumber_perpustakaan,
-            'status' => $request->status,
+        if ($request->hasFile('img')) {
+            $image = $request->file('img');
+            $imageName = time() . '_' . $image->getClientOriginalName(); // Nama unik
+            $image->move(public_path('bukuofflineimg'), $imageName); // Simpan di folder public/sparepart
+        } else {
+            $imageName = null; // Jika tidak ada gambar yang diupload
+        }
+
+        $BukuOffline = BukuOffline::create([
+            'judul' => $validated['judul'],
+            'kategori' => $validated['kategori'],
+            'penjelasan' => $validated['penjelasan'],
+            'penulis' => $validated['penulis'],
+            'tahun_rilis' => $validated['tahun_rilis'],
+            'penerbit' => $validated['penerbit'],
+            'tahun_terbit' => $validated['tahun_terbit'],
+            'stok' => $validated['stok'],
+            'img' => $imageName,
+            'sumber_perpustakaan' => $validated['sumber_perpustakaan'],
+            'status' => $validated['status'],
         ]);
+
+        // simpan genre satu per satu
+        foreach ($request->genres as $g) {
+            Genre::create([
+                'id_buku' => $BukuOffline->id_buku,
+                'genre'   => $g,
+            ]);
+        }
 
         return redirect('BukuOffline')->with('success', 'buku berhasil ditambahkan!');
     }
@@ -68,7 +94,8 @@ class BukuOfflineController extends Controller
     public function edit($id_buku)
     {
         $BukuOffline = BukuOffline::where('id_buku', $id_buku)->first();
-        return view('BukuOffline.edit', compact('BukuOffline'));
+        $genreOptions = Genre::select('genre')->distinct()->pluck('genre');
+        return view('BukuOffline.edit', compact('BukuOffline', 'genres', 'genreOptions'));
     }
 
     /**
@@ -76,36 +103,61 @@ class BukuOfflineController extends Controller
      */
     public function update(Request $request, string $id_buku)
     {
-        $request->validate([
+        $BukuOffline = BukuOffline::where('id_buku', $id_buku)->firstOrFail();
+
+        $validated = $request->validate([
             'judul' => 'required|string|max:50',
             'kategori' => 'required|string|max:20',
-            'genre' => 'required|string|max:20',
-            'penjelasan' => 'required|string|max:255',
+            'genres' => 'required|array',
+            'penjelasan' => 'required|string',
             'penulis' => 'required|string|max:30',
+            'tahun_rilis' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
             'penerbit' => 'required|string|max:20',
+            'tahun_terbit' => 'required|digits:4|integer|min:1900|max:' . date('Y'),
+            'stok' => 'required|integer|digits_between:1,2',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'sumber_perpustakaan' => 'required|string|max:30',
             'status' => 'required|string|in:tersedia,tidak tersedia',
         ]);
 
-        // Cari siswa berdasarkan id
-        $BukuOffline = BukuOffline::where('id_buku', $id_buku)->first();
+        // handle gambar
+        if ($request->hasFile('img')) {
+            $image = $request->file('img');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('bukuofflineimg'), $imageName);
 
-        // Kalau siswa tidak ditemukan
-        if (!$BukuOffline) {
-            return redirect()->route('BukuOffline.index')->with('error', 'Data buku tidak ditemukan!');
+            // hapus gambar lama
+            if ($BukuOffline->img && file_exists(public_path('bukuofflineimg/' . $BukuOffline->img))) {
+                unlink(public_path('bukuofflineimg/' . $BukuOffline->img));
+            }
+        } else {
+            $imageName = $BukuOffline->img;
         }
 
-        // Update data siswa
+        // update buku
         $BukuOffline->update([
-            'judul' => $request->judul,
-            'kategori' => $request->kategori,
-            'genre' => $request->genre,
-            'penjelasan' => $request->penjelasan,
-            'penulis' => $request->penulis,
-            'penerbit' => $request->penerbit,
-            'sumber_perpustakaan' => $request->sumber_perpustakaan,
-            'status' => $request->status,
+            'judul' => $validated['judul'],
+            'kategori' => $validated['kategori'],
+            'penjelasan' => $validated['penjelasan'],
+            'penulis' => $validated['penulis'],
+            'tahun_rilis' => $validated['tahun_rilis'],
+            'penerbit' => $validated['penerbit'],
+            'tahun_terbit' => $validated['tahun_terbit'],
+            'stok' => $validated['stok'],
+            'img' => $imageName,
+            'sumber_perpustakaan' => $validated['sumber_perpustakaan'],
+            'status' => $validated['status'],
         ]);
+
+        // update genre
+        $BukuOffline->genres()->delete();
+        foreach ($validated['genres'] as $g) {
+            Genre::create([
+                'id_buku' => $BukuOffline->id_buku,
+                'genre'   => $g,
+            ]);
+        }
+
 
         return redirect()->route('BukuOffline.index')->with('success', 'Data buku berhasil diperbarui!');
     }
@@ -115,8 +167,19 @@ class BukuOfflineController extends Controller
      */
     public function destroy($id_buku)
     {
-        $BukuOffline = BukuOffline::where('id_buku', $id_buku)->first();
+        $BukuOffline = BukuOffline::where('id_buku', $id_buku)->firstOrFail();
+
+        // hapus genre dulu
+        $BukuOffline->genres()->delete();
+
+        // hapus gambar jika ada
+        if ($BukuOffline->img && file_exists(public_path('bukuofflineimg/' . $BukuOffline->img))) {
+            unlink(public_path('bukuofflineimg/' . $BukuOffline->img));
+        }
+
+        // hapus buku
         $BukuOffline->delete();
+
         return redirect('BukuOffline')->with('success', 'Buku berhasil dihapus!');
     }
 }

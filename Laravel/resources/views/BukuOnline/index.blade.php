@@ -62,6 +62,7 @@
                                             <th>Buku URL</th>
                                             <th>Penulis</th>
                                             <th>Sumber</th>
+                                            <th>Image</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -78,13 +79,21 @@
                                                 <td>{{ $row->penulis }}</td>
                                                 <td>{{ $row->sumber }}</td>
                                                 <td>
+                                                @if($row->img)
+                                                <img src="{{ asset('bukuonlineimg/' . $row->img) }}" width="100">
+                                                @else
+                                                Tidak ada gambar
+                                                @endif
+                                                </td>
+                                                <td>
                                                     <button class="btn btn-sm btn-warning btn-edit" data-id="{{ $row->id_buku }}"
                                                         data-judul="{{ $row->judul }}" data-kategori="{{ $row->kategori }}"
                                                         data-genre="{{ $row->genre }}"
                                                         data-penjelasan="{{ $row->penjelasan }}"
+                                                        data-img="{{ $row->img }}"
                                                         data-url="{{ $row->buku_url }}" data-penulis="{{ $row->penulis }}"
                                                         data-sumber="{{ $row->sumber }}">Edit</button>
-                                                    <form action="{{ url('BukuOnline/' . $row->id_buku) }}" method="POST"
+                                                        <form action="{{ url('BukuOnline/' . $row->id_buku) }}" method="POST"
                                                         style="display:inline;">
                                                         @csrf
                                                         @method('DELETE')
@@ -111,7 +120,7 @@
                                         <div class="text-left">
                                             <h1 class="h4 text-gray-900 mb-4">Tambah Data</h1>
                                         </div>
-                                        <form class="user" action="{{ route('BukuOnline.store') }}" method="POST">
+                                        <form class="user" action="{{ route('BukuOnline.store') }}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-group">
                                                 <input type="text" class="form-control form-control-user" name="judul"
@@ -140,6 +149,13 @@
                                             <div class="form-group">
                                                 <input type="text" class="form-control form-control-user" name="sumber"
                                                     placeholder="Sumber" required>
+                                            </div>
+<div class="form-group">
+                                                <div class="custom-file">
+                                                    <img id="previewTambah" src="" alt="Preview Gambar" width="150" class="mt-5 d-none">
+                                                    <input type="file" class="custom-file-input" id="fotoTambah" name="img" required>
+                                                    <label class="custom-file-label" for="fotoTambah">Pilih gambar...</label>
+                                                </div>
                                             </div>
                                             <button type="submit"
                                                 class="btn btn-info btn-user btn-block">Simpan</button>
@@ -192,6 +208,13 @@
                                             <div class="form-group">
                                                 <input type="text" class="form-control form-control-user" name="sumber"
                                                     id="sumber" placeholder="Sumber" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-file">
+                                                    <img id="previewImg" src="" alt="Gambar Buku" width="150" class="mt-5 d-none">
+                                                    <input type="file" class="custom-file-input" id="fotoEdit" name="img">
+                                                    <label class="custom-file-label" for="fotoEdit">Pilih gambar...</label>
+                                                </div>
                                             </div>
                                             <button type="submit"
                                                 class="btn btn-info btn-user btn-block">Perbarui</button>
@@ -253,6 +276,7 @@
                 const kategori = this.dataset.kategori;
                 const genre = this.dataset.genre;
                 const penjelasan = this.dataset.penjelasan;
+                const img = this.dataset.img;
                 const url = this.dataset.url;
                 const penulis = this.dataset.penulis;
                 const sumber = this.dataset.sumber;
@@ -264,12 +288,55 @@
                 document.getElementById('kategori').value = kategori;
                 document.getElementById('genre').value = genre;
                 document.getElementById('penjelasan').value = penjelasan;
+                const previewImg = document.getElementById('previewImg');
+                if (img) {
+                previewImg.src = `/bukuonlineimg/${img}`;
+                previewImg.classList.remove('d-none');
+                } else {
+                previewImg.classList.add('d-none');
+                }
                 document.getElementById('buku_url').value = url;
                 document.getElementById('penulis').value = penulis;
                 document.getElementById('sumber').value = sumber;
             });
         });
     </script>
+    <script>
+  document.querySelectorAll('.custom-file-input').forEach(input => {
+  input.addEventListener('change', function(e) {
+    var fileName = e.target.files[0]?.name;
+    if (fileName) {
+      e.target.nextElementSibling.innerText = fileName;
+    }
+  });
+});
+
+  document.getElementById('fotoEdit').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      document.getElementById('previewImg').src = event.target.result;
+      document.getElementById('previewImg').classList.remove('d-none');
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Tambah Data - preview gambar
+document.getElementById('fotoTambah').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      document.getElementById('previewTambah').src = event.target.result;
+      document.getElementById('previewTambah').classList.remove('d-none');
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+</script>
 
 </body>
 

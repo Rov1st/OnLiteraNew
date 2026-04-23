@@ -34,16 +34,26 @@ class BukuOnlineController extends Controller
             'kategori' => 'required|string|max:20',
             'genre' => 'required|string|max:20',
             'penjelasan' => 'required|string|max:255',
+            'img' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi gambar
             'buku_url' => 'required|string|max:255',
             'penulis' => 'required|string|max:30',
             'sumber' => 'required|string|max:30',
         ]);
+
+        if ($request->hasFile('img')) {
+            $image = $request->file('img');
+            $imageName = time() . '_' . $image->getClientOriginalName(); // Nama unik
+            $image->move(public_path('bukuonlineimg'), $imageName); // Simpan di folder public/sparepart
+        } else {
+            $imageName = null; // Jika tidak ada gambar yang diupload
+        }
 
         BukuOnline::create([
             'judul' => $request->judul,
             'kategori' => $request->kategori,
             'genre' => $request->genre,
             'penjelasan' => $request->penjelasan,
+            'img' => $imageName,
             'buku_url' => $request->buku_url,
             'penulis' => $request->penulis,
             'sumber' => $request->sumber,
@@ -75,19 +85,33 @@ class BukuOnlineController extends Controller
      */
     public function update(Request $request, string $id_buku)
     {
+        $BukuOnline = BukuOnline::where('id_buku', $id_buku)->first();
         // Validasi data input
         $request->validate([
             'judul' => 'required|string|max:50',
             'kategori' => 'required|string|max:20',
             'genre' => 'required|string|max:20',
             'penjelasan' => 'required|string|max:255',
+            'img' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi gambar
             'buku_url' => 'required|string|max:255',
             'penulis' => 'required|string|max:30',
             'sumber' => 'required|string|max:30',
         ]);
 
+        if ($request->hasFile('img')) {
+            $image = $request->file('img');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('bukuonlineimg'), $imageName);
+
+            // hapus file lama jika ada
+            if ($BukuOnline->img && file_exists(public_path('bukuonlineimg/' . $BukuOnline->img))) {
+                unlink(public_path('bukuonlineimg/' . $BukuOnline->img));
+            }
+        } else {
+            $imageName = $BukuOnline->img; // tetap pakai gambar lama
+        }
+
         // Cari siswa berdasarkan id
-        $BukuOnline = BukuOnline::where('id_buku', $id_buku)->first();
 
         // Kalau siswa tidak ditemukan
         if (!$BukuOnline) {
@@ -100,6 +124,7 @@ class BukuOnlineController extends Controller
             'kategori' => $request->kategori,
             'genre' => $request->genre,
             'penjelasan' => $request->penjelasan,
+            'img' => $imageName,
             'buku_url' => $request->buku_url,
             'penulis' => $request->penulis,
             'sumber' => $request->sumber,
@@ -114,6 +139,14 @@ class BukuOnlineController extends Controller
     public function destroy($id_buku)
     {
         $BukuOnline = BukuOnline::where('id_buku', $id_buku)->first();
+         if ($BukuOnline->image) {
+            $imagePath = public_path('BukuOnline/' . $BukuOnline->image);
+
+            // Hapus gambar jika file ada
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
         $BukuOnline->delete();
         return redirect('BukuOnline')->with('success', 'Buku berhasil dihapus!');
     }

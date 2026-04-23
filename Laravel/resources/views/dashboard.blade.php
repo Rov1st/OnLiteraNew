@@ -43,9 +43,56 @@
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                        <a href="#" data-toggle="modal" data-target="#reportModal"
+                            class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
+                            <i class="fas fa-download fa-sm text-white-50"></i> Generate Report
+                        </a>
                     </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog"
+                        aria-labelledby="reportModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <form id="laporanForm">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Pilih Periode Laporan</h5>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="bulan">Bulan</label>
+                                            <select name="bulan" id="bulan" class="form-control" required>
+                                                <option value="1">Januari</option>
+                                                <option value="2">Februari</option>
+                                                <option value="3">Maret</option>
+                                                <option value="4">April</option>
+                                                <option value="5">Mei</option>
+                                                <option value="6">Juni</option>
+                                                <option value="7">Juli</option>
+                                                <option value="8">Agustus</option>
+                                                <option value="9">September</option>
+                                                <option value="10">Oktober</option>
+                                                <option value="11">November</option>
+                                                <option value="12">Desember</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tahun">Tahun</label>
+                                            <input type="number" id="tahun" class="form-control" value="{{ date('Y') }}"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-info">Download</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
 
                     <!-- Content Row -->
                     <div class="row">
@@ -106,6 +153,42 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Peminjaman Bulan Ini</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $peminjamanBulanIni }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Pengembalian Bulan Ini</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pengembalianBulanIni }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card border-left-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                        Total Denda Bulan Ini</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">Rp
+                                        {{ number_format($totalDendaBulanIni, 0, ',', '.') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- Content Row -->
 
                     <div class="row">
@@ -132,6 +215,52 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+
+                                    <!-- Pie Chart Status -->
+                                    <div class="col-xl-6 col-lg-6">
+                                        <div class="card shadow mb-4">
+                                            <div class="card-header py-3">
+                                                <h6 class="m-0 font-weight-bold text-primary">Status Peminjaman</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="statusChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bar Chart Top Buku -->
+                                    <div class="col-xl-6 col-lg-6">
+                                        <div class="card shadow mb-4">
+                                            <div class="card-header py-3">
+                                                <h6 class="m-0 font-weight-bold text-success">Top 5 Buku Paling Dipinjam
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="topBukuChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+
+                                    <!-- Bar Chart Top User -->
+                                    <div class="col-xl-12 col-lg-12">
+                                        <div class="card shadow mb-4">
+                                            <div class="card-header py-3">
+                                                <h6 class="m-0 font-weight-bold text-warning">Top 5 User Paling Aktif
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="topUserChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
                                 <!-- Card Body -->
                                 <div class="card-body">
                                     <div class="chart-area">
@@ -193,9 +322,74 @@
     <script src="{{ asset('vendor/chart.js/Chart.min.js') }}"></script>
     <script src="{{ asset('js/demo/chart-area-demo.js') }}"></script>
 
+    <script>
+        // Pie Chart Status Peminjaman
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: {!! json_encode($statusPeminjaman->keys()) !!},
+                datasets: [{
+                    data: {!! json_encode($statusPeminjaman->values()) !!},
+                    backgroundColor: ['#1cc88a', '#e74a3b', '#36b9cc']
+                }]
+            }
+        });
+
+        // Bar Chart Top Buku
+        const topBukuCtx = document.getElementById('topBukuChart').getContext('2d');
+        new Chart(topBukuCtx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($topBuku->pluck('buku.judul')) !!},
+                datasets: [{
+                    label: 'Jumlah Dipinjam',
+                    data: {!! json_encode($topBuku->pluck('total')) !!},
+                    backgroundColor: '#4e73df'
+                }]
+            }
+        });
+
+        // Bar Chart Top User
+        const topUserCtx = document.getElementById('topUserChart').getContext('2d');
+        new Chart(topUserCtx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($topUser->pluck('user.name')) !!},
+                datasets: [{
+                    label: 'Jumlah Peminjaman',
+                    data: {!! json_encode($topUser->pluck('total')) !!},
+                    backgroundColor: '#f6c23e'
+                }]
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById('laporanForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            let bulan = document.getElementById('bulan').value;
+            let tahun = document.getElementById('tahun').value;
+            window.location.href = `/laporan-bulanan/${bulan}/${tahun}`;
+        });
+    </script>
+
+
 
 
 
 </body>
+<div id="notifPopup"
+     style="display:none;
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            background:#007bff;
+            color:white;
+            padding:15px;
+            border-radius:8px;
+            box-shadow:0px 4px 10px rgba(0,0,0,0.3);
+            z-index:9999;">
+</div>
 
 </html>
