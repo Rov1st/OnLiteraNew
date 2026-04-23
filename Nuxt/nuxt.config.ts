@@ -4,7 +4,8 @@ export default defineNuxtConfig({
   components: true,
   runtimeConfig: {
     public: {
-      apiBase: 'http://localhost:8000/api'
+      apiBase: 'http://localhost:8000/api',
+      laravelBase: 'http://localhost:8000'
     }
   },
   compatibilityDate: "2025-07-15",

@@ -156,5 +156,17 @@ const submitForm = async () => {
     }
   }
 }
+
+// watch(
+//     () => auth.user,
+//     (user) => {
+//         if (user) {
+//             navigateTo("/perpustakaan")
+//         } else {
+//             navigateTo("")
+//         }
+//     },
+//     { immediate: true }
+// )
 </script>
 

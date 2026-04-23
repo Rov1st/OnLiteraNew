@@ -7,6 +7,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
   auth.initAuth() // Ambil token dari localStorage
 
   if (!auth.isLoggedIn()) {
-    return navigateTo('')
+    return navigateTo('login')
   }
 })

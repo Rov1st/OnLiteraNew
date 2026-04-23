@@ -28,8 +28,8 @@
                             Email
                         </label>
                         <input v-model="form.email" id="email"
-                            class="block w-full h-10 mt-1 border border-slate-300 rounded px-2" type="email" name="email"
-                            required autofocus autocomplete="username" />
+                            class="block w-full h-10 mt-1 border border-slate-300 rounded px-2" type="email"
+                            name="email" required autofocus autocomplete="username" />
                         <p v-if="errors.email" class="mt-2 text-red-600 text-sm">
                             {{ errors.email }}
                         </p>
@@ -63,7 +63,6 @@
                         <NuxtLink to="/forgot-password" class="text-sm text-gray-600 hover:text-gray-900 underline">
                             Forgot your password?
                         </NuxtLink>
-
                         <button type="submit"
                             class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                             Login
@@ -89,51 +88,55 @@ const config = useRuntimeConfig()
 const auth = useAuthStore()
 
 const form = ref({
-  email: '',
-  password: '',
-  remember: false,
+    email: '',
+    password: '',
+    remember: false,
 })
 const errors = ref({})
 const status = ref('')
 
 const submitForm = async () => {
-  errors.value = {}
-  status.value = ''
+    errors.value = {}
+    status.value = ''
 
-  try {
-    const res = await $fetch(`${config.public.apiBase}/login`, {
-      method: 'POST',
-      body: {
-        email: form.value.email,
-        password: form.value.password,
-        remember: form.value.remember,
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    try {
+        const res = await $fetch(`${config.public.apiBase}/login`, {
+            method: 'POST',
+            body: {
+                email: form.value.email,
+                password: form.value.password,
+                remember: form.value.remember,
+            },
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
 
-    status.value = 'Login successful!'
-    console.log('Login response:', res)
+        status.value = 'Login successful!'
+        console.log('Login response:', res)
+        
+        if (res.user?.id) {
+            localStorage.setItem("user_id", res.user.id)
+        }
 
-    // Simpan token & user di store Pinia
-    auth.login(res.access_token, res.user)
+        // Simpan token & user di store Pinia
+        auth.login(res.access_token, res.user)
 
-    // Redirect setelah login
-    navigateTo('/')
+        // Redirect setelah login
+        navigateTo('/')
 
-  } catch (err) {
-    console.error('Login error:', err)
+    } catch (err) {
+        console.error('Login error:', err)
 
-    if (err.status === 422 && err.data && err.data.errors) {
-      errors.value = Object.fromEntries(
-        Object.entries(err.data.errors).map(([key, messages]) => [key, messages[0]])
-      )
-    } else if (err.data?.message) {
-      status.value = err.data.message
-    } else {
-      status.value = 'Login failed. Please try again.'
+        if (err.status === 422 && err.data && err.data.errors) {
+            errors.value = Object.fromEntries(
+                Object.entries(err.data.errors).map(([key, messages]) => [key, messages[0]])
+            )
+        } else if (err.data?.message) {
+            status.value = err.data.message
+        } else {
+            status.value = 'Login failed. Please try again.'
+        }
     }
-  }
 }
 </script>
